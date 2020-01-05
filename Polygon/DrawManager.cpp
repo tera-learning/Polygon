@@ -83,7 +83,7 @@ HRESULT DrawManager::Create(HWND hwnd)
 	//////////////////////////////////////////////////////////////////////////////////
 	D3D11_BUFFER_DESC bufferDesc;
 	ZeroMemory(&bufferDesc, sizeof(D3D11_BUFFER_DESC));
-	bufferDesc.ByteWidth = sizeof(Vertex) * m_VertexManager.getVertexNum();	//バッファーのサイズ (バイト単位)
+	bufferDesc.ByteWidth = sizeof(Vertex) * m_VertexManager.GetVertexNum();	//バッファーのサイズ (バイト単位)
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;									//バッファーで想定されている読み込みおよび書き込みの方法
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;						//バッファーをどのようにパイプラインにバインドするか
 	bufferDesc.CPUAccessFlags = 0;											//CPU アクセスのフラグ
@@ -92,7 +92,7 @@ HRESULT DrawManager::Create(HWND hwnd)
 
 	D3D11_SUBRESOURCE_DATA subresource;
 	ZeroMemory(&subresource, sizeof(D3D11_SUBRESOURCE_DATA));
-	subresource.pSysMem = m_VertexManager.getVertexList();	//初期化データへのポインタ
+	subresource.pSysMem = m_VertexManager.GetVertexList();	//初期化データへのポインタ
 	subresource.SysMemPitch = 0;							//テクスチャーにある 1 本の線の先端から隣の線までの距離 (バイト単位) 
 	subresource.SysMemSlicePitch = 0;						//1 つの深度レベルの先端から隣の深度レベルまでの距離 (バイト単位)
 
@@ -196,6 +196,7 @@ HRESULT DrawManager::Create(HWND hwnd)
 	m_ViewPort.MinDepth = 0.0f;					//ビューポートの最小深度
 	m_ViewPort.MaxDepth = 1.0f;					//ビューポートの最大深度
 
+
 	return hresult;
 }
 
@@ -212,7 +213,13 @@ void DrawManager::Render()
 	m_Context->RSSetViewports(1, &m_ViewPort);												//ビューポートの設定
 	m_Context->PSSetShader(m_PixelShader.Get(), nullptr, 0);								//ピクセルシェーダーの設定
 	m_Context->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);			//レンダーターゲットの設定
+
 	m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), color);						//レンダーターゲットをクリアする
-	m_Context->Draw(m_VertexManager.getVertexNum(), 0);										//描画する
+	m_Context->Draw(m_VertexManager.GetVertexNum(), 0);										//描画する
 	m_Swapchain->Present(0, 0);																//スワップ チェーンが所有するバック バッファのシーケンスの中の次のバッファの内容を表示
+}
+
+void DrawManager::AddVertex(const Vertex& vertex)
+{
+	m_VertexManager.AddVertex(vertex);
 }

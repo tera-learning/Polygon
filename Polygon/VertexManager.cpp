@@ -4,12 +4,6 @@
 
 VertexManager::VertexManager()
 {
-	m_VertexNum = 4;
-
-	m_VertexList.push_back({ { -0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } });
-	m_VertexList.push_back({ { -0.5f,  0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } });
-	m_VertexList.push_back({ {  0.5f, -0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } });
-	m_VertexList.push_back({ {  0.5f,  0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f, 1.0f } });
 }
 
 VertexManager::~VertexManager()
@@ -18,12 +12,18 @@ VertexManager::~VertexManager()
 	m_VertexNum = 0;
 }
 
-const Vertex* VertexManager::getVertexList(void)
+const Vertex* VertexManager::GetVertexList(void)
 {
 	return &m_VertexList[0];
 }
 
-int VertexManager::getVertexNum(void)
+int VertexManager::GetVertexNum(void)
 {
 	return m_VertexNum;
+}
+
+void VertexManager::AddVertex(const Vertex& vertex)
+{
+	m_VertexList.push_back(vertex);
+	m_VertexNum = m_VertexList.size();
 }

@@ -25,5 +25,6 @@ public:
 
 	HRESULT Create(HWND hwnd);
 	void Render();
+	void AddVertex(const Vertex& vertex);
 };
 

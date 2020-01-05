@@ -1,4 +1,5 @@
 #include "DrawManager.h"
+#include <atltypes.h>
 #include <Windows.h>
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -45,14 +46,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (!RegisterClassEx(&winc)) return 0;
 
+	//////////////////////////////////////////////////////////////////////////////////
+	//ウィンドウ生成
+	//////////////////////////////////////////////////////////////////////////////////
+	int width = 600;
+	int height = 600;
+
 	HWND hwnd = CreateWindow(
 		winc.lpszClassName,
 		TEXT("Polygon"),
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		100,
-		100,
-		800,
-		600,
+		0,
+		0,
+		width,
+		height,
 		nullptr,
 		nullptr,
 		hInstance,
@@ -60,12 +67,51 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	if (hwnd == NULL) return 0;
 
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//クライアント領域基準で再生成
+	//////////////////////////////////////////////////////////////////////////////////
+	CRect crect, wrect;
+	GetWindowRect(hwnd, &wrect);
+	GetClientRect(hwnd, &crect);
+
+	int newWidth = width + ((wrect.right - wrect.left) - (crect.right - crect.left));
+	int newHeight = height + ((wrect.bottom - wrect.top) - (crect.bottom - crect.top));
+
+	SetWindowPos(hwnd, nullptr, 0, 0, newWidth, newHeight, SWP_SHOWWINDOW);
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
 	
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//描画
+	//////////////////////////////////////////////////////////////////////////////////
 	DrawManager dx11Manager;
+
+	//クライアント領域の再取得
+	GetClientRect(hwnd, &crect);
+	//クライアント領域の中心座標
+	CPoint center = crect.CenterPoint();
+	//描画したい四角形のピクセル座標
+	CRect pixel(200, 100, 400, 300);
+	//クライアント領域中心～描画したい四角形の左上座標までの距離
+	FLOAT left = static_cast<FLOAT>(pixel.left - center.x) / center.x;
+	FLOAT top = static_cast<FLOAT>(center.y - pixel.top) / center.y;
+	//クライアント領域中心～描画したい四角形の右下座標までの距離
+	FLOAT right = static_cast<FLOAT>(pixel.right - center.x) / center.x;
+	FLOAT bottom = static_cast<FLOAT>(center.y - pixel.bottom) / center.y;
+
+	dx11Manager.AddVertex({ {left, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
+	dx11Manager.AddVertex({ {right, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
+	dx11Manager.AddVertex({ {left, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
+	dx11Manager.AddVertex({ {right, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
+
 	dx11Manager.Create(hwnd);
 
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//描画
+	//////////////////////////////////////////////////////////////////////////////////
 	MSG msg{};
 	while (msg.message != WM_QUIT)
 	{

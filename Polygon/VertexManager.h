@@ -16,6 +16,7 @@ public:
 	VertexManager();
 	~VertexManager();
 
-	const Vertex* getVertexList(void);
-	int getVertexNum(void);
+	const Vertex* GetVertexList(void);
+	int GetVertexNum(void);
+	void AddVertex(const Vertex& vertex);
 };
