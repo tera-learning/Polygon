@@ -8,19 +8,19 @@ TextureManager::TextureManager()
 	m_Height = 2;
 	m_PixelByte = 4;
 
-	m_Buffer.push_back(255);
 	m_Buffer.push_back(0);
 	m_Buffer.push_back(0);
 	m_Buffer.push_back(255);
-
-	m_Buffer.push_back(0);
-	m_Buffer.push_back(255);
-	m_Buffer.push_back(0);
 	m_Buffer.push_back(255);
 
 	m_Buffer.push_back(0);
+	m_Buffer.push_back(255);
 	m_Buffer.push_back(0);
 	m_Buffer.push_back(255);
+
+	m_Buffer.push_back(255);
+	m_Buffer.push_back(0);
+	m_Buffer.push_back(0);
 	m_Buffer.push_back(255);
 
 	m_Buffer.push_back(255);
