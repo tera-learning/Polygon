@@ -101,10 +101,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	FLOAT right = static_cast<FLOAT>(pixel.right - center.x) / center.x;
 	FLOAT bottom = static_cast<FLOAT>(center.y - pixel.bottom) / center.y;
 
-	dx11Manager.AddVertex({ {left, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
-	dx11Manager.AddVertex({ {right, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
-	dx11Manager.AddVertex({ {left, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
-	dx11Manager.AddVertex({ {right, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
+	dx11Manager.AddVertex({ {left, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f} });
+	dx11Manager.AddVertex({ {right, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f} });
+	dx11Manager.AddVertex({ {left, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f} });
+	dx11Manager.AddVertex({ {right, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 1.0f} });
 
 	dx11Manager.Create(hwnd);
 

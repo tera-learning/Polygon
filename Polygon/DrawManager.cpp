@@ -141,8 +141,9 @@ HRESULT DrawManager::Create(HWND hwnd)
 	//入力レイアウトの生成
 	//////////////////////////////////////////////////////////////////////////////////
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,    0,                            0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,								D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	hresult = m_Device->CreateInputLayout(
@@ -187,6 +188,63 @@ HRESULT DrawManager::Create(HWND hwnd)
 
 
 	//////////////////////////////////////////////////////////////////////////////////
+	//テクスチャの作成
+	//////////////////////////////////////////////////////////////////////////////////
+
+	D3D11_TEXTURE2D_DESC texture2DDesc;
+	ZeroMemory(&texture2DDesc, sizeof(D3D11_TEXTURE2D_DESC));
+	texture2DDesc.Width = m_TextureManager.getWidth();
+	texture2DDesc.Height = m_TextureManager.getHeight();
+	texture2DDesc.MipLevels = 1;
+	texture2DDesc.ArraySize = 1;
+	texture2DDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	texture2DDesc.SampleDesc.Count = 1;
+	texture2DDesc.SampleDesc.Quality = 0;
+	texture2DDesc.Usage = D3D11_USAGE_DEFAULT;
+	texture2DDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texture2DDesc.CPUAccessFlags = 0;
+	texture2DDesc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA subTextureResource;
+	ZeroMemory(&subTextureResource, sizeof(D3D11_SUBRESOURCE_DATA));
+	subTextureResource.pSysMem = m_TextureManager.getTextureBuffer();
+	subTextureResource.SysMemPitch = m_TextureManager.getWidth() * m_TextureManager.getPixelByte();
+
+	hresult = m_Device->CreateTexture2D(&texture2DDesc, &subTextureResource, &m_Texture);
+
+	if (FAILED(hresult))
+		return hresult;
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
+	ZeroMemory(&shaderResourceViewDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+	shaderResourceViewDesc.Format = texture2DDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	hresult = m_Device->CreateShaderResourceView(m_Texture.Get(), &shaderResourceViewDesc, &m_TextureView);
+
+	if (FAILED(hresult))
+		return hresult;
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//サンプラーの作成
+	//////////////////////////////////////////////////////////////////////////////////
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;	//拡大縮小時の色の取得方法
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;		//UV座標が範囲外の場合の色の取得方法
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;		//UV座標が範囲外の場合の色の取得方法
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;		//UV座標が範囲外の場合の色の取得方法
+
+	hresult = m_Device->CreateSamplerState(&samplerDesc, &m_SamplerState);
+
+	if (FAILED(hresult))
+		return hresult;
+
+
+	//////////////////////////////////////////////////////////////////////////////////
 	//ビューポートの生成
 	//////////////////////////////////////////////////////////////////////////////////
 	m_ViewPort.TopLeftX = 0;					//ビューポートの左側の X 位置
@@ -213,6 +271,8 @@ void DrawManager::Render()
 	m_Context->RSSetViewports(1, &m_ViewPort);												//ビューポートの設定
 	m_Context->PSSetShader(m_PixelShader.Get(), nullptr, 0);								//ピクセルシェーダーの設定
 	m_Context->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);			//レンダーターゲットの設定
+	m_Context->PSSetShaderResources(0, 1, m_TextureView.GetAddressOf());					//テクスチャの設定
+	m_Context->PSSetSamplers(0, 1, m_SamplerState.GetAddressOf());							//サンプラーの設定
 
 	m_Context->ClearRenderTargetView(m_RenderTargetView.Get(), color);						//レンダーターゲットをクリアする
 	m_Context->Draw(m_VertexManager.GetVertexNum(), 0);										//描画する

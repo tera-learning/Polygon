@@ -4,6 +4,7 @@
 struct Vertex {
 	float pos[3];
 	float col[4];
+	float tex[2];
 };
 
 class VertexManager
