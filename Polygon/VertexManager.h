@@ -2,7 +2,7 @@
 #include <vector>
 
 struct Vertex {
-	float pos[3];
+	int pos[2];
 	float col[4];
 	float tex[2];
 };

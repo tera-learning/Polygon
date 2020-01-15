@@ -5,6 +5,10 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 
+struct ConstantBuffer {
+	int centerWindow[2];
+};
+
 class DrawManager
 {
 private:
@@ -23,13 +27,14 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_SamplerState;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureView;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_ConstantBuffer;
 	D3D11_VIEWPORT m_ViewPort;
 
 	DrawManager() {};
 	~DrawManager() { m_Context->ClearState();  };
 
 	HRESULT Create(HWND hwnd);
-	void Render();
+	void Render(HWND hwnd);
 	void AddVertex(const Vertex& vertex);
 };
 

@@ -94,17 +94,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CPoint center = crect.CenterPoint();
 	//描画したい四角形のピクセル座標
 	CRect pixel(200, 100, 400, 300);
-	//クライアント領域中心～描画したい四角形の左上座標までの距離
-	FLOAT left = static_cast<FLOAT>(pixel.left - center.x) / center.x;
-	FLOAT top = static_cast<FLOAT>(center.y - pixel.top) / center.y;
-	//クライアント領域中心～描画したい四角形の右下座標までの距離
-	FLOAT right = static_cast<FLOAT>(pixel.right - center.x) / center.x;
-	FLOAT bottom = static_cast<FLOAT>(center.y - pixel.bottom) / center.y;
 
-	dx11Manager.AddVertex({ {left, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f} });
-	dx11Manager.AddVertex({ {right, top, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f} });
-	dx11Manager.AddVertex({ {left, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f} });
-	dx11Manager.AddVertex({ {right, bottom, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 1.0f} });
+	dx11Manager.AddVertex({ {pixel.left, pixel.top}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f} });
+	dx11Manager.AddVertex({ {pixel.right, pixel.top}, {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 0.0f} });
+	dx11Manager.AddVertex({ {pixel.left, pixel.bottom}, {0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 1.0f} });
+	dx11Manager.AddVertex({ {pixel.right, pixel.bottom}, {0.0f, 1.0f, 0.0f, 1.0f}, {1.0f, 1.0f} });
 
 	dx11Manager.Create(hwnd);
 
@@ -122,7 +116,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		else
 		{
-			dx11Manager.Render();
+			dx11Manager.Render(hwnd);
 		}
 	}
 

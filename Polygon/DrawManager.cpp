@@ -105,6 +105,23 @@ HRESULT DrawManager::Create(HWND hwnd)
 	if (FAILED(hresult))
 		return hresult;
 
+	
+	//////////////////////////////////////////////////////////////////////////////////
+	//定数バッファの設定
+	//////////////////////////////////////////////////////////////////////////////////
+
+	D3D11_BUFFER_DESC constantBufferDesc;
+	ZeroMemory(&constantBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	constantBufferDesc.ByteWidth = ((sizeof(ConstantBuffer) - 1) / 16 + 1) * 16;
+	constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;									//バッファーで想定されている読み込みおよび書き込みの方法
+	constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;						//バッファーをどのようにパイプラインにバインドするか
+	constantBufferDesc.CPUAccessFlags = 0;											//CPU アクセスのフラグ
+
+	hresult = m_Device->CreateBuffer(&constantBufferDesc, nullptr, &m_ConstantBuffer);
+
+	if (FAILED(hresult))
+		return hresult;
+
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//VertexShaderの生成
@@ -141,7 +158,7 @@ HRESULT DrawManager::Create(HWND hwnd)
 	//入力レイアウトの生成
 	//////////////////////////////////////////////////////////////////////////////////
 	D3D11_INPUT_ELEMENT_DESC vertexDesc[] = {
-		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,								D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION",	0, DXGI_FORMAT_R32G32_UINT,			0,	0,								D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
@@ -258,8 +275,18 @@ HRESULT DrawManager::Create(HWND hwnd)
 	return hresult;
 }
 
-void DrawManager::Render()
+void DrawManager::Render(HWND hwnd)
 {
+
+	CRect rect;
+	CPoint center;
+	GetClientRect(hwnd, &rect);
+	center = rect.CenterPoint();
+
+	ConstantBuffer constantBuffer;
+	constantBuffer.centerWindow[0] = center.x;
+	constantBuffer.centerWindow[1] = center.y;
+
 	FLOAT color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	UINT strides = sizeof(Vertex);
 	UINT offsets = 0;
@@ -267,6 +294,8 @@ void DrawManager::Render()
 	m_Context->IASetInputLayout(m_InputLayout.Get());										//インプットレイアウトの設定
 	m_Context->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &strides, &offsets);	//頂点バッファの設定
 	m_Context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);				//頂点バッファがどの順番で三角形を作るか
+	m_Context->VSSetConstantBuffers(0, 1, m_ConstantBuffer.GetAddressOf());					//定数バッファの設定
+	m_Context->UpdateSubresource(m_ConstantBuffer.Get(), 0, nullptr, &constantBuffer, 0, 0);//定数バッファの更新
 	m_Context->VSSetShader(m_VertexShader.Get(), nullptr, 0);								//頂点シェーダーの設定
 	m_Context->RSSetViewports(1, &m_ViewPort);												//ビューポートの設定
 	m_Context->PSSetShader(m_PixelShader.Get(), nullptr, 0);								//ピクセルシェーダーの設定
