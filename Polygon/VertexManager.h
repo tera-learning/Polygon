@@ -15,6 +15,8 @@ private:
 
 public:
 	VertexManager();
+	VertexManager(const VertexManager& vertexManager) = delete;
+	VertexManager& operator=(const VertexManager& vertexManager) = delete;
 	/*virtual*/ ~VertexManager();
 
 	const Vertex* GetVertexList(void);

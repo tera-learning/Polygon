@@ -31,6 +31,8 @@ public:
 	D3D11_VIEWPORT m_ViewPort;
 
 	DrawManager() {};
+	DrawManager(const DrawManager& drawManager) = delete;
+	DrawManager& operator=(const DrawManager& drawManager) = delete;
 	/* virtual */ ~DrawManager() { m_Context->ClearState();  };
 
 	HRESULT Create(HWND hwnd);

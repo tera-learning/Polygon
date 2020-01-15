@@ -11,6 +11,8 @@ private:
 
 public:
 	TextureManager();
+	TextureManager(const TextureManager& textureManager) = delete;
+	TextureManager& operator=(const TextureManager& textureManager) = delete;
 	/* virtual */ ~TextureManager();
 
 	int getWidth(void);
