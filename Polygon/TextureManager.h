@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-class TextureManager
+class TextureManager final
 {
 private:
 	std::vector<unsigned char> m_Buffer;
@@ -11,7 +11,7 @@ private:
 
 public:
 	TextureManager();
-	~TextureManager();
+	/* virtual */ ~TextureManager();
 
 	int getWidth(void);
 	int getHeight(void);

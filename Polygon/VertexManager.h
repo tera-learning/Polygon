@@ -7,7 +7,7 @@ struct Vertex {
 	float tex[2];
 };
 
-class VertexManager
+class VertexManager final
 {
 private:
 	int m_VertexNum;
@@ -15,7 +15,7 @@ private:
 
 public:
 	VertexManager();
-	~VertexManager();
+	/*virtual*/ ~VertexManager();
 
 	const Vertex* GetVertexList(void);
 	int GetVertexNum(void);

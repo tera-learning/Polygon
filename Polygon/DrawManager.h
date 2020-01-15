@@ -9,7 +9,7 @@ struct ConstantBuffer {
 	int centerWindow[2];
 };
 
-class DrawManager
+class DrawManager final
 {
 private:
 	VertexManager m_VertexManager;
@@ -31,7 +31,7 @@ public:
 	D3D11_VIEWPORT m_ViewPort;
 
 	DrawManager() {};
-	~DrawManager() { m_Context->ClearState();  };
+	/* virtual */ ~DrawManager() { m_Context->ClearState();  };
 
 	HRESULT Create(HWND hwnd);
 	void Render(HWND hwnd);
